@@ -71,6 +71,7 @@ int uart_read_nonblock(void)
 
 void uart_write(char c)
 {
+	/*
 	unsigned int oldmask;
 	unsigned int tx_produce_next = (tx_produce + 1) & UART_RINGBUFFER_MASK_TX;
 
@@ -89,6 +90,11 @@ void uart_write(char c)
 		uart_rxtx_write(c);
 	}
 	irq_setmask(oldmask);
+	*/
+	int timeout = 60000;
+	while(uart_txfull_read() && timeout--)
+		;
+	uart_rxtx_write(c);
 }
 
 void uart_init(void)
@@ -101,10 +107,10 @@ void uart_init(void)
 
 	uart_ev_pending_write(uart_ev_pending_read());
 	uart_ev_enable_write(UART_EV_TX | UART_EV_RX);
-	irq_setmask(irq_getmask() | (1 << UART_INTERRUPT));
+	//irq_setmask(irq_getmask() | (1 << UART_INTERRUPT));
 }
 
 void uart_sync(void)
 {
-	while(tx_consume != tx_produce);
+	//while(tx_consume != tx_produce);
 }
